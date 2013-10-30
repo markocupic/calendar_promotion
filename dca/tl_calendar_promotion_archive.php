@@ -27,7 +27,6 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
               'onload_callback' => array
               (
                      array('tl_calendar_promotion_archive', 'setPalette'),
-                     //array('tl_news_archive', 'generateFeed')
               ),
               'onsubmit_callback' => array
               ( // array('tl_news_archive', 'autoGenerateChildRecords')
@@ -95,8 +94,9 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
        'palettes' => array
        (
               //'__selector__'     => array('xxx'),
-              'default' => '{title_legend},eventtitle,eventtype,year,tolerance,singleSRC,errormessage;',
-              'annual' => '{title_legend},videotitle,alias,videotype;{youtube_legend},thumb,size,descr,youtube_id;'
+              'default' => '{title_legend},eventtitle,eventtype;',
+              'adventskalender' => '{title_legend},eventtitle,eventtype,year,tolerance,singleSRC,errormessage;',
+              'wochenkalender' => '{title_legend},eventtitle,eventtype,starttime,endtime,tolerance,singleSRC,errormessage;',
        ),
 
        // Fields
@@ -120,6 +120,22 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
                      'eval' => array('mandatory' => true, 'tl_class' => 'w50')
               ),
 
+              'starttime' => array
+              (
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['starttime'],
+                     'exclude' => true,
+                     'inputType' => 'text',
+                     'eval' => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard')
+              ),
+
+              'endtime' => array
+              (
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['endtime'],
+                     'exclude' => true,
+                     'inputType' => 'text',
+                     'eval' => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'w50 wizard')
+              ),
+
               'eventtype' => array
               (
                      'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['eventtype'],
@@ -127,8 +143,9 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
                      'default' => 'adventskalender',
                      'inputType' => 'select',
                      'default' => 'adventskalender',
-                     'options' => array('adventskalender',
-                            //'kalenderwochenevent'
+                     'options' => array(
+                            'adventskalender',
+                            'wochenkalender'
                      ),
                      'eval' => array('mandatory' => true, 'submitOnChange' => true, 'includeBlankOption' => false, 'tl_class' => 'clr')
               ),
@@ -172,22 +189,57 @@ class tl_calendar_promotion_archive extends Backend
                             ->execute($id);
 
                      // check for child Records
-                     $objEvent = $this->Database->prepare('SELECT * FROM tl_calendar_promotion WHERE pid=?')
+                     $objChild = $this->Database->prepare('SELECT * FROM tl_calendar_promotion WHERE pid=?')
                             ->execute($id);
-                     if (!$objEvent->numRows) {
-                            // case Adventskalender
-                            for ($day = 1; $day < 25; $day++) {
-                                   $set = array(
-                                          'pid' => $id,
-                                          'tstamp' => time(),
-                                          'eventtstamp' => mktime(0, 0, 0, 12, $day, $objEventArchive->year),
-                                          'displayorder' => rand(1, 999999999)
-                                   );
 
-                                   $objInsert = $this->Database->prepare('INSERT INTO tl_calendar_promotion %s')
-                                          ->set($set)
-                                          ->execute();
-                            }
+                     switch ($objEventArchive->eventtype) {
+                            case 'adventskalender':
+                                   // case adventskalender
+                                   if (!$objChild->numRows) {
+                                          for ($day = 1; $day < 25; $day++) {
+                                                 $set = array(
+                                                        'pid' => $id,
+                                                        'tstamp' => time(),
+                                                        'eventtstamp' => mktime(0, 0, 0, 12, $day, $objEventArchive->year),
+                                                        'displayorder' => rand(1, 999999999)
+                                                 );
+
+                                                 $objInsert = $this->Database->prepare('INSERT INTO tl_calendar_promotion %s')
+                                                        ->set($set)
+                                                        ->execute();
+                                          }
+                                   }
+                                   break;
+                            case 'wochenkalender':
+                                   // case wochenkalender
+                                   $objInsert = $this->Database->prepare('DELETE FROM tl_calendar_promotion WHERE pid=?')->execute($id);
+
+                                   if ($objEventArchive->endtime <= $objEventArchive->starttime) return;
+                                   if ($objEventArchive->endtime == '' or $objEventArchive->endtime < 1) return;
+                                   if ($objEventArchive->starttime == '' or $objEventArchive->starttime < 1) return;
+
+                                   if (!$objChild->numRows) {
+                                          $eventtstamp = $objEventArchive->starttime;
+                                          while ($eventtstamp <= $objEventArchive->endtime) {
+                                                 $set = array(
+                                                        'pid' => $id,
+                                                        'tstamp' => time(),
+                                                        'eventtstamp' => $eventtstamp,
+                                                        'displayorder' => $eventtstamp
+                                                 );
+
+
+                                                 $objInsert = $this->Database->prepare('INSERT INTO tl_calendar_promotion %s')
+                                                        ->set($set)
+                                                        ->execute();
+                                                 $day = $this->parseDate("Y-m-d", $eventtstamp);
+                                                 $nextDay = strtotime("+1 day", strtotime($day));
+                                                 $eventtstamp = $nextDay;
+                                          }
+
+
+                                   }
+                                   break;
                      }
                      $this->redirect('main.php?do=calendar_promotion&table=tl_calendar_promotion&id=' . $id);
               }
@@ -195,7 +247,10 @@ class tl_calendar_promotion_archive extends Backend
 
        public function setPalette()
        {
+              $objArchive = $this->Database->prepare('SELECT * FROM tl_calendar_promotion_archive WHERE id=?')->execute($this->Input->get('id'));
+              if ($objArchive->eventtype == '') return;
 
+              $GLOBALS['TL_DCA']['tl_calendar_promotion_archive']['palettes']['default'] = $GLOBALS['TL_DCA']['tl_calendar_promotion_archive']['palettes'][$objArchive->eventtype];
        }
 
 }

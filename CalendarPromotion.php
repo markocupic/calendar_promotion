@@ -54,27 +54,40 @@ class CalendarPromotion extends ContentElement
        protected function compile()
        {
               $promId = $this->calendar_promotion_archive;
-
               $objArchive = $this->Database->prepare('SELECT * FROM tl_calendar_promotion_archive WHERE id=?')->execute($promId);
-              $objChilds = $this->Database->prepare('SELECT * FROM tl_calendar_promotion WHERE pid=? ORDER BY displayorder')->execute($promId);
+              $case = $objArchive->eventtype;
+              switch ($case) {
+                     case 'adventskalender':
+                            $objChilds = $this->Database->prepare('SELECT * FROM tl_calendar_promotion WHERE pid=? ORDER BY displayorder')->execute($promId);
+                            break;
 
+                     case 'wochenkalender':
+                            //tstamp Monday of current week
+                            $tstampMonday = strtotime($this->parseDate('Y') . 'W' . $this->parseDate('W'));
+                            $tstampSunday = strtotime('next Sunday', $tstampMonday);
+                            $objChilds = $this->Database->prepare('SELECT * FROM tl_calendar_promotion WHERE pid=? AND eventtstamp >= ? AND eventtstamp <= ? ORDER BY displayorder')->execute($promId, $tstampMonday, $tstampSunday);
+                            break;
+              }
               $arrBoxes = $objChilds->fetchAllAssoc();
+
+              // switch for testmode
+              $testmode = null;
+              $today = ($testmode ? mktime(0, 0, 0, 12, 6, 2013) : time());
+
               $i = 0;
-              //$today = mktime(0, 0, 0);
-              $today = mktime(0, 0, 0, 12, 6, 2013);
-              $now = time();
-              // echo $today . ' ' . $now . '<br>';
+
               $tolerance = $objArchive->tolerance * 24 * 3600;
+
               foreach ($arrBoxes as $box) {
                      $error = 1;
                      $case = 'toearly';
-                     if ($today - intval($box['eventtstamp'])==0) {
+                     if ($today - intval($box['eventtstamp']) == 0) {
                             //just in time
                             $arrBoxes[$i]['class'] = 'justintime';
                             $error = null;
                             $case = 'justintime';
                             $arrBoxes[$i]['allowed'] = 1;
-                     } elseif ($today - intval($box['eventtstamp']) <= $tolerance && $today - intval($box['eventtstamp'])>0) {
+                     } elseif ($today - intval($box['eventtstamp']) <= $tolerance && $today - intval($box['eventtstamp']) > 0) {
                             // still in time
                             $arrBoxes[$i]['class'] = 'stillintime';
                             $error = null;
@@ -94,7 +107,7 @@ class CalendarPromotion extends ContentElement
                             $case = 'toearly';
                             $arrBoxes[$i]['allowed'] = null;
 
-                     }else{
+                     } else {
                             // other error
                             $arrBoxes[$i]['class'] = 'error';
                             $error = 1;
@@ -102,9 +115,6 @@ class CalendarPromotion extends ContentElement
                             $arrBoxes[$i]['allowed'] = null;
 
                      }
-                    // echo $today - intval($box['eventtstamp']);
-                     //echo $case . "<br>";
-
 
                      // generate product image if all ok!
                      if (!error) {

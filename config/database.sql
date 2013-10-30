@@ -19,6 +19,8 @@ CREATE TABLE `tl_calendar_promotion_archive` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `pid` int(10) NOT NULL default '0',
   `year` int(4) unsigned NOT NULL default '0',
+  `starttime` int(4) unsigned NOT NULL default '0',
+  `endtime` int(4) unsigned NOT NULL default '0',
   `tolerance` int(3) unsigned NOT NULL default '0',
   `sorting` int(10) unsigned NOT NULL default '0',
   `tstamp` int(10) unsigned NOT NULL default '0',
