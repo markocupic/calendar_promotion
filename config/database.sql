@@ -43,13 +43,14 @@ CREATE TABLE `tl_calendar_promotion` (
   `tstamp` int(10) unsigned NOT NULL default '0',
   `eventtstamp` int(10) unsigned NOT NULL default '0',
   `href` varchar(64) NOT NULL default '',
+  `openInNewWindow` char(1) NOT NULL default '',
   `singleSRC` varchar(255) NOT NULL default '',
   `title` varchar(64) NOT NULL default '',
   `description` text NOT NULL,
   `displayorder` int(10) NOT NULL default '0',
   `mbwidth` int(10) unsigned NOT NULL default '0',
   `mbheight` int(10) unsigned NOT NULL default '0',
-
+  `cssID` varchar(255) NOT NULL default '',
    PRIMARY KEY  (`id`),
    KEY `pid` (`pid`)
 ) ENGINE=MyISAM  CHARSET=utf8;

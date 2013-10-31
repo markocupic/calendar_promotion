@@ -73,13 +73,13 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion'] = array(
                             'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion']['show'],
                             'href' => 'act=show',
                             'icon' => 'show.gif'
-                     )
+                     ),
               )
        ),
 
        // Palettes
        'palettes' => array(
-              'default' => 'title,description,href,eventtstamp,singleSRC,mbwidth,mbheight',
+              'default' => 'title,description,href,openInNewWindow,eventtstamp,singleSRC,mbwidth,mbheight,cssID',
        ),
 
        // Fields
@@ -138,12 +138,27 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion'] = array(
                             'tl_class' => 'clr'
                      )
               ),
+              'openInNewWindow' => array(
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion']['openInNewWindow'],
+                     'exclude' => true,
+                     'inputType' => 'checkbox',
+                     'eval' => array(
+                            'tl_class' => 'clr'
+                     )
+              ),
               'singleSRC' => array
               (
                      'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion']['singleSRC'],
                      'exclude' => true,
                      'inputType' => 'fileTree',
                      'eval' => array('fieldType' => 'radio', 'files' => true, 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr')
+              ),
+              'cssID' => array
+              (
+                     'label'                   => &$GLOBALS['TL_LANG']['tl_calendar_promotion']['cssID'],
+                     'exclude'                 => true,
+                     'inputType'               => 'text',
+                     'eval'                    => array('multiple'=>true, 'size'=>2, 'tl_class'=>'w50 clr')
               )
        )
 );

@@ -212,8 +212,6 @@ class tl_calendar_promotion_archive extends Backend
                                    break;
                             case 'wochenkalender':
                                    // case wochenkalender
-                                   $objInsert = $this->Database->prepare('DELETE FROM tl_calendar_promotion WHERE pid=?')->execute($id);
-
                                    if ($objEventArchive->endtime <= $objEventArchive->starttime) return;
                                    if ($objEventArchive->endtime == '' or $objEventArchive->endtime < 1) return;
                                    if ($objEventArchive->starttime == '' or $objEventArchive->starttime < 1) return;

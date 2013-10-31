@@ -53,6 +53,11 @@ class CalendarPromotion extends ContentElement
         */
        protected function compile()
        {
+              // switch for testmode
+              $testmode = null;
+              $testmode = true;
+              $today = ($testmode ? mktime(0, 0, 0, 12, 6, 2013) : time());
+
               $promId = $this->calendar_promotion_archive;
               $objArchive = $this->Database->prepare('SELECT * FROM tl_calendar_promotion_archive WHERE id=?')->execute($promId);
               $case = $objArchive->eventtype;
@@ -70,50 +75,53 @@ class CalendarPromotion extends ContentElement
               }
               $arrBoxes = $objChilds->fetchAllAssoc();
 
-              // switch for testmode
-              $testmode = null;
-              $today = ($testmode ? mktime(0, 0, 0, 12, 6, 2013) : time());
 
               $i = 0;
 
               $tolerance = $objArchive->tolerance * 24 * 3600;
 
               foreach ($arrBoxes as $box) {
+
                      $error = 1;
-                     $case = 'toearly';
+
+                     $arrCSS = deserialize($arrBoxes[$i]['cssID'], true);
+                     // css id
+                     $arrBoxes[$i]['cssID'] = $arrCSS[0] != '' ? $arrCSS[1] : null;
+                     // css class
+                     $arrCssClasses = $arrCSS[1] != '' ? explode(' ', $arrCSS[1]) : array();
+
                      if ($today - intval($box['eventtstamp']) == 0) {
                             //just in time
-                            $arrBoxes[$i]['class'] = 'justintime';
+                            $arrCssClasses[] = 'justintime';
                             $error = null;
                             $case = 'justintime';
                             $arrBoxes[$i]['allowed'] = 1;
                      } elseif ($today - intval($box['eventtstamp']) <= $tolerance && $today - intval($box['eventtstamp']) > 0) {
                             // still in time
-                            $arrBoxes[$i]['class'] = 'stillintime';
+                            $arrCssClasses[] = 'stillintime';
                             $error = null;
                             $case = 'stillintime';
                             $arrBoxes[$i]['allowed'] = 1;
                      } elseif (intval($box['eventtstamp']) + $tolerance < $today) {
                             // expired
-                            $arrBoxes[$i]['class'] = 'expired';
+                            $arrCssClasses[] = 'expired';
                             $error = 1;
                             $case = 'expired';
                             $arrBoxes[$i]['allowed'] = null;
 
                      } elseif ($today - intval($box['eventtstamp']) < 0) {
                             //toearly
-                            $arrBoxes[$i]['class'] = 'toearly';
+                            $arrCssClasses[] = 'toearly';
                             $error = 1;
                             $case = 'toearly';
                             $arrBoxes[$i]['allowed'] = null;
 
                      } else {
                             // other error
-                            $arrBoxes[$i]['class'] = 'error';
+                            $arrCssClasses[] = 'error';
                             $error = 1;
                             $case = 'error';
                             $arrBoxes[$i]['allowed'] = null;
-
                      }
 
                      // generate product image if all ok!
@@ -127,7 +135,6 @@ class CalendarPromotion extends ContentElement
                      }
 
                      if ($error) {
-                            $arrBoxes[$i]['class'] = $case;
                             unset($arrBoxes[$i]['href']);
                             $arrBoxes[$i]['title'] = 'Fehlermeldung';
                             $arrBoxes[$i]['description'] = nl2br($objArchive->errormessage);
@@ -138,6 +145,8 @@ class CalendarPromotion extends ContentElement
                                    }
                             }
                      }
+
+                     $arrBoxes[$i]['cssClass'] = implode(' ', $arrCssClasses);
 
                      $arrBoxes[$i]['mbsize'] = (!$arrBoxes[$i]['mbwidth'] && !$arrBoxes[$i]['mbheight'] ? '' : $arrBoxes[$i]['mbwidth'] . ' ' . $arrBoxes[$i]['mbheight']);
                      $i++;
