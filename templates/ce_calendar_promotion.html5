@@ -9,7 +9,7 @@
         <?php foreach ($this->arrBoxes as $box): ?>
 
         <div <?php if($box['cssID'] != ''): ?>id="<?php echo $box['cssID']; ?>"<?php endif; ?> class="calendarBox <?php echo $box['cssClass']; ?>">
-            <a href="javascript:void(0);" onclick="Mediabox.open([['#mb_PopUp_<?php echo $box['id']; ?>','Adventskalender::','<?php echo $box['mbsize']; ?>']],0,Mediabox.customOptions);NBcloseOnExit=false;">
+            <a href="javascript:void(0);" onclick="<?php if($box['allowed']): ?>objCountClicks.init(<?php echo $box['id']; ?>,<?php echo $this->elementId; ?>); <?php endif; ?>Mediabox.open([['#mb_PopUp_<?php echo $box['id']; ?>','Adventskalender::','<?php echo $box['mbsize']; ?>']],0,Mediabox.customOptions);NBcloseOnExit=false;">
                 <?php echo $this->parseDate('d', $box['eventtstamp']); ?>
             </a>
         </div>
@@ -49,4 +49,39 @@
     </div>
 
 </div>
+
+<script>
+    CountClicks = new Class({
+        initialize: function ()
+        {
+            //constructor
+        },
+
+        init: function (windowId, elementId)
+        {
+            this.windowId = windowId;
+            this.elementId = elementId;
+            this.sendData();
+        },
+
+        sendData: function ()
+        {
+            var self = this;
+            var myRequest = new Request({
+                url: 'ajax.php',
+                method: 'get',
+
+                onSuccess: function(responseJson)
+                {
+
+                }
+            });
+            myRequest.send('isAjax=1&action=cte&do=countClicks&id=' + self.elementId + '&windowId=' + self.windowId + '');
+        }
+    });
+
+    var objCountClicks = new CountClicks();
+
+    //--><!]]>
+</script>
 

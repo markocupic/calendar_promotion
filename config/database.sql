@@ -18,6 +18,8 @@
 CREATE TABLE `tl_calendar_promotion_archive` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `pid` int(10) NOT NULL default '0',
+  `testmode` char(1) NOT NULL default '',
+  `virtualTestdate` int(10) unsigned NOT NULL default '0',
   `year` int(4) unsigned NOT NULL default '0',
   `starttime` int(4) unsigned NOT NULL default '0',
   `endtime` int(4) unsigned NOT NULL default '0',
@@ -26,9 +28,10 @@ CREATE TABLE `tl_calendar_promotion_archive` (
   `tstamp` int(10) unsigned NOT NULL default '0',
   `eventtitle` varchar(64) NOT NULL default '',
   `eventtype` varchar(64) NOT NULL default '',
-  `singleSRC` varchar(255) NOT NULL default '',
-  `errormessage` text NOT NULL,
-
+  `singleSRCToEarly` varchar(255) NOT NULL default '',
+  `errormessageToEarly` text NOT NULL,
+  `singleSRCExpired` varchar(255) NOT NULL default '',
+  `errormessageExpired` text NOT NULL,
   KEY `pid` (`pid`)
    PRIMARY KEY  (`id`),
 ) ENGINE=MyISAM  CHARSET=utf8;
@@ -41,6 +44,7 @@ CREATE TABLE `tl_calendar_promotion` (
   `pid` int(10) NOT NULL default '0',
   `sorting` int(10) unsigned NOT NULL default '0',
   `tstamp` int(10) unsigned NOT NULL default '0',
+  `visits` int(10) unsigned NOT NULL default '0',
   `eventtstamp` int(10) unsigned NOT NULL default '0',
   `href` varchar(64) NOT NULL default '',
   `openInNewWindow` char(1) NOT NULL default '',
@@ -51,6 +55,19 @@ CREATE TABLE `tl_calendar_promotion` (
   `mbwidth` int(10) unsigned NOT NULL default '0',
   `mbheight` int(10) unsigned NOT NULL default '0',
   `cssID` varchar(255) NOT NULL default '',
+   PRIMARY KEY  (`id`),
+   KEY `pid` (`pid`)
+) ENGINE=MyISAM  CHARSET=utf8;
+
+
+
+--
+-- Table `tl_calendar_promotion_count_clicks`
+--
+CREATE TABLE `tl_calendar_promotion_count_clicks` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `pid` int(10) NOT NULL default '0',
+  `ip` varchar(20) NOT NULL default '',
    PRIMARY KEY  (`id`),
    KEY `pid` (`pid`)
 ) ENGINE=MyISAM  CHARSET=utf8;

@@ -18,6 +18,7 @@
 
 $GLOBALS['TL_LANG']['tl_calendar_promotion']['title'] = array('Überschrift', 'Dem Element eine Überscrift hinzufügen.');
 $GLOBALS['TL_LANG']['tl_calendar_promotion']['description'] = array('Beschreibung', 'Dem Element eine Beschreibung hinzufügen.');
+$GLOBALS['TL_LANG']['tl_calendar_promotion']['visits'] = array('Anzahl Besuche', '');
 $GLOBALS['TL_LANG']['tl_calendar_promotion']['href'] = array('Weiterleitung', 'Wohin soll weitergeleitet werden (webshop)?');
 $GLOBALS['TL_LANG']['tl_calendar_promotion']['openInNewWindow'] = array('Link im neuen Fenster/Tab öffnen');
 $GLOBALS['TL_LANG']['tl_calendar_promotion']['eventtstamp'] = array('Datum der Aktion');

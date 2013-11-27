@@ -93,10 +93,14 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
        // Palettes
        'palettes' => array
        (
-              //'__selector__'     => array('xxx'),
+              '__selector__'     => array('testmode'),
               'default' => '{title_legend},eventtitle,eventtype;',
-              'adventskalender' => '{title_legend},eventtitle,eventtype,year,tolerance,singleSRC,errormessage;',
-              'wochenkalender' => '{title_legend},eventtitle,eventtype,starttime,endtime,tolerance,singleSRC,errormessage;',
+              'adventskalender' => '{testmode_legend},testmode;{setting_legend},eventtitle,eventtype,year,tolerance;{errormessage_legend},singleSRCToEarly,errormessageToEarly,singleSRCExpired,errormessageExpired;',
+              'wochenkalender' => '{testmode_legend},testmode;{setting_legend},eventtitle,eventtype,starttime,endtime,tolerance;{errormessage_legend},singleSRCToEarly,errormessageToEarly,singleSRCExpired,errormessageExpired;',
+       ),
+       'subpalettes' => array
+       (
+              'testmode'  => 'virtualTestdate'
        ),
 
        // Fields
@@ -118,6 +122,20 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
                      'options' => range(date('Y') - 2, date('Y') + 5),
                      'default' => date('Y'),
                      'eval' => array('mandatory' => true, 'tl_class' => 'w50')
+              ),
+              'testmode' => array
+              (
+                     'label'                   => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['testmode'],
+                     'exclude'                 => true,
+                     'inputType'               => 'checkbox',
+                     'eval'                    => array('submitOnChange'=>true)
+              ),
+              'virtualTestdate' => array
+              (
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['virtualTestdate'],
+                     'exclude' => true,
+                     'inputType' => 'text',
+                     'eval' => array('rgxp' => 'date', 'datepicker' => true, 'tl_class' => 'clr wizard')
               ),
 
               'starttime' => array
@@ -166,6 +184,38 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion_archive'] = array
               ),
               'errormessage' => array(
                      'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['errormessage'],
+                     'exclude' => true,
+                     'inputType' => 'textarea',
+                     'eval' => array(
+                            'rte' => 'tinyMCE',
+                            'tl_class' => 'clr'
+                     )
+              ),
+              'singleSRCToEarly' => array
+              (
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['singleSRCToEarly'],
+                     'exclude' => true,
+                     'inputType' => 'fileTree',
+                     'eval' => array('fieldType' => 'radio', 'files' => true, 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr')
+              ),
+              'errormessageToEarly' => array(
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['errormessageToEarly'],
+                     'exclude' => true,
+                     'inputType' => 'textarea',
+                     'eval' => array(
+                            'rte' => 'tinyMCE',
+                            'tl_class' => 'clr'
+                     )
+              ),
+              'singleSRCExpired' => array
+              (
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['singleSRCExpired'],
+                     'exclude' => true,
+                     'inputType' => 'fileTree',
+                     'eval' => array('fieldType' => 'radio', 'files' => true, 'filesOnly' => true, 'mandatory' => false, 'tl_class' => 'clr')
+              ),
+              'errormessageExpired' => array(
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion_archive']['errormessageExpired'],
                      'exclude' => true,
                      'inputType' => 'textarea',
                      'eval' => array(

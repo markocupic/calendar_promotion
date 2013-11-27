@@ -1,52 +1,86 @@
 <?php $GLOBALS['TL_CSS'][] = 'tl_files/extension_development/cal_promo.css'; ?>
 <div class="<?php echo $this->class; ?> block"<?php echo $this->cssID; ?><?php if ($this->style): ?> style="<?php echo $this->style; ?>"<?php endif; ?>>
 
-    <?php if ($this->headline): ?>
-    <<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+        <?php if ($this->headline): ?>
+<<?php echo $this->hl; ?>><?php echo $this->headline; ?></<?php echo $this->hl; ?>>
+        <?php endif; ?>
+
+<div class="calendarContainer">
+<?php foreach ($this->arrBoxes as $box): ?>
+
+<div <?php if($box['cssID'] != ''): ?>id="<?php echo $box['cssID']; ?>"<?php endif; ?> class="calendarBox <?php echo $box['cssClass']; ?>">
+<a href="javascript:void(0);" onclick="<?php if($box['allowed']): ?>objCountClicks.init(<?php echo $box['id']; ?>,<?php echo $this->elementId; ?>); <?php endif; ?>Mediabox.open([['#mb_PopUp_<?php echo $box['id']; ?>','Adventskalender::','<?php echo $box['mbsize']; ?>']],0,Mediabox.customOptions);NBcloseOnExit=false;">
+    <?php echo $this->parseDate('d', $box['eventtstamp']); ?>
+</a>
+</div>
+<div id="mb_PopUp_<?php echo $box['id']; ?>" class="calPopUp" style="display:none;">
+<div class="popUp">
+
+    <?php if ($box['title'] != ''): ?>
+    <div class="titleContainer">
+        <h1>
+            <?php echo $box['title']; ?>
+        </h1>
+    </div>
     <?php endif; ?>
 
-    <div class="calendarContainer">
-        <?php foreach ($this->arrBoxes as $box): ?>
-
-        <div <?php if($box['cssID'] != ''): ?>id="<?php echo $box['cssID']; ?>"<?php endif; ?> class="calendarBox <?php echo $box['cssClass']; ?>">
-            <a href="javascript:void(0);" onclick="Mediabox.open([['#mb_PopUp_<?php echo $box['id']; ?>','Adventskalender::','<?php echo $box['mbsize']; ?>']],0,Mediabox.customOptions);NBcloseOnExit=false;">
-                <?php echo $this->parseDate('d', $box['eventtstamp']); ?>
-            </a>
-        </div>
-            <div id="mb_PopUp_<?php echo $box['id']; ?>" class="calPopUp" style="display:none;">
-                <div class="popUp">
-
-                    <?php if ($box['title'] != ''): ?>
-                    <div class="titleContainer">
-                        <h1>
-                            <?php echo $box['title']; ?>
-                        </h1>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if ($box['description'] != ''): ?>
-                    <div class="descriptionContainer">
-                            <?php echo $box['description']; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if ($box['singleSRC'] != ''): ?>
-                    <div class="imageContainer">
-                        <img src="<?php echo $box['singleSRC']; ?>" alt="">
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if ($box['href']): ?>
-                    <div class="linkContainer">
-                        <a href="<?php echo $box['href']; ?>" onclick="<?php echo $box['openInNewWindow'] ? 'window.open(this.href); return false;' : ''; ?>">zum Shop</a>
-                    </div>
-                    <?php endif; ?>
-
-                </div>
-            </div>
-
-        <?php endforeach; ?>
+    <?php if ($box['description'] != ''): ?>
+    <div class="descriptionContainer">
+        <?php echo $box['description']; ?>
     </div>
+    <?php endif; ?>
+
+    <?php if ($box['singleSRC'] != ''): ?>
+    <div class="imageContainer">
+        <img src="<?php echo $box['singleSRC']; ?>" alt="">
+    </div>
+    <?php endif; ?>
+
+    <?php if ($box['href']): ?>
+    <div class="linkContainer">
+        <a href="<?php echo $box['href']; ?>" onclick="<?php echo $box['openInNewWindow'] ? 'window.open(this.href); return false;' : ''; ?>">zum Shop</a>
+    </div>
+    <?php endif; ?>
 
 </div>
+</div>
 
+        <?php endforeach; ?>
+        </div>
+
+        </div>
+
+<script>
+CountClicks = new Class({
+    initialize: function ()
+    {
+        //constructor
+    },
+
+    init: function (windowId, elementId)
+    {
+        this.windowId = windowId;
+        this.elementId = elementId;
+        this.sendData();
+    },
+
+    sendData: function ()
+    {
+        var self = this;
+        var myRequest = new Request({
+            url: 'ajax.php',
+            method: 'get',
+
+            onSuccess: function(responseJson)
+            {
+
+            }
+        });
+        myRequest.send('isAjax=1&action=cte&do=countClicks&id=' + self.elementId + '&windowId=' + self.windowId + '');
+    }
+});
+
+var objCountClicks = new CountClicks();
+
+//--><!]]>
+</script>

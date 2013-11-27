@@ -79,6 +79,7 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion'] = array(
 
        // Palettes
        'palettes' => array(
+              //'default' => 'title,description,visits,href,openInNewWindow,eventtstamp,singleSRC,mbwidth,mbheight,cssID',
               'default' => 'title,description,href,openInNewWindow,eventtstamp,singleSRC,mbwidth,mbheight,cssID',
        ),
 
@@ -108,6 +109,15 @@ $GLOBALS['TL_DCA']['tl_calendar_promotion'] = array(
                      'eval' => array(
                             'rte' => 'tinyMCE',
                             'tl_class' => 'clr'
+                     )
+              ),
+              'visits' => array(
+                     'label' => &$GLOBALS['TL_LANG']['tl_calendar_promotion']['visits'],
+                     'exclude' => true,
+                     'inputType' => 'text',
+                     'eval' => array(
+                            'rgxp' => 'alnum',
+                            'tl_class' => 'w50'
                      )
               ),
               'mbwidth' => array(
