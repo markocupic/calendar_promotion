@@ -139,6 +139,10 @@ class CalendarPromotion extends ContentElement
                      }
                      $arrBoxes[$i]['cssClass'] = implode(' ', $arrCssClasses);
                      $arrBoxes[$i]['mbsize'] = (!$arrBoxes[$i]['mbwidth'] && !$arrBoxes[$i]['mbheight'] ? '' : $arrBoxes[$i]['mbwidth'] . ' ' . $arrBoxes[$i]['mbheight']);
+
+                     // Display Klick-Counter
+                     //$arrBoxes[$i]['description' ] .= '<br><br>Anzahl Klicks: ' . $box['visits'];
+
                      $i++;
               }
               $this->Template->elementId = $this->id;
